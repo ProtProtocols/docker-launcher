@@ -10,22 +10,29 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.stage.DirectoryChooser;
 import org.protprotocols.dockerlauncher.Tasks.ListenContainerTask;
 import org.protprotocols.dockerlauncher.gui.DockerLauncherGuiApplication;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 
 public class DlgImageSettingsController extends DialogController {
-    private final static Logger log = Logger.getLogger(DlgImageSettingsController.class.getName());
+    private final Logger log = LoggerFactory.getLogger(DlgImageSettingsController.class);
+
 
     @FXML public ChoiceBox protocolList;
     @FXML public TextField workingDirectoryPath;
@@ -58,7 +65,7 @@ public class DlgImageSettingsController extends DialogController {
                 protocolList.setValue(installedProtocols.get(0));
             }
         } else {
-            log.severe("No protocols set");
+            log.error("No protocols set");
         }
     }
 
@@ -141,9 +148,24 @@ public class DlgImageSettingsController extends DialogController {
             // open the website with a short delay
             // TODO: check that the server is running
             TimeUnit.SECONDS.sleep(1);
-            log.info("Openging web browser for http://localhost:" + String.valueOf(port));
-            HostServices hostServices = new DockerLauncherGuiApplication().getHostServices();
-            hostServices.showDocument("http://localhost:" + String.valueOf(port));
+            String dockerUrl = "http://localhost:" + String.valueOf(port);
+            log.info("Openging web browser for " + dockerUrl);
+
+            boolean browserLaunched = false;
+            if (Desktop.isDesktopSupported()) {
+                Desktop desktop = Desktop.getDesktop();
+                if (desktop.isSupported(Desktop.Action.BROWSE)) {
+                    log.info("Using desktop.browse");
+                    desktop.browse(new URI(dockerUrl));
+                    browserLaunched = true;
+                }
+            }
+            if (!browserLaunched) {
+                HostServices hostServices = new DockerLauncherGuiApplication().getHostServices();
+                hostServices.showDocument(dockerUrl);
+
+            }
+
             containerURL.setText("http://localhost:" + String.valueOf(port));
 
             // Exec command inside running container with attached STDOUT and STDERR

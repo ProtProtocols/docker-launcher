@@ -5,13 +5,14 @@ import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.LogStream;
 import javafx.concurrent.Task;
 import javafx.scene.control.TextArea;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 
 public class ListenContainerTask extends Task {
-    private final static Logger log = Logger.getLogger(ListenContainerTask.class.getName());
+    private final static Logger log = LoggerFactory.getLogger(ListenContainerTask.class);
     private final TextArea textArea;
     private final String containerId;
 
@@ -22,13 +23,13 @@ public class ListenContainerTask extends Task {
 
     @Override
     protected Object call() throws Exception {
-        log.info("Starting to listen for container output...");
+        log.debug("Starting to listen for container output...");
         int nPreviousLines = 0;
 
         try (DockerClient docker = DefaultDockerClient.fromEnv().build()) {
             while (true) {
                 if (isCancelled() || isDone()) {
-                    log.info("Listening task cancelled");
+                    log.debug("Listening task cancelled");
                     return null;
                 }
 
@@ -55,7 +56,7 @@ public class ListenContainerTask extends Task {
                 }
             }
         } catch (Exception e) {
-            log.warning("Listening thread failed: " + e.getMessage());
+            log.warn("Listening thread failed: " + e.getMessage());
         }
 
         return null;

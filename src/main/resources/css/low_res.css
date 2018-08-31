@@ -1,0 +1,22 @@
+/* https://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html#introinheritance */
+.root {
+    -fx-font-size: 12pt;
+}
+TextArea {
+    -fx-font-size: 11pt;
+    -fx-font-family: monospace;
+}
+
+.header {
+    -fx-font-size: 15pt;
+    -fx-font-weight: bold;
+}
+
+HBox {
+    -fx-spacing: 10px;
+}
+
+VBox {
+    -fx-spacing: 5px;
+    -fx-padding: 10px;
+}

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextArea?>
@@ -10,20 +9,21 @@
 
 <AnchorPane maxHeight="900.0" maxWidth="700.0" minHeight="287.0" minWidth="447.0" prefHeight="287.0" prefWidth="447.0" xmlns="http://javafx.com/javafx/8.0.181" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.protprotocols.dockerlauncher.Controller.DlgLoadImageController">
    <children>
-      <VBox prefHeight="400.0" prefWidth="600.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <VBox prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <Label text="Docker Status:" />
+            <Label styleClass="header" text="Docker Status:" />
             <TextArea fx:id="statusTextArea" editable="false" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
-            <Button id="btn_load_docker_image" fx:id="btnLoadDockerImage" disable="true" mnemonicParsing="false" onAction="#onLoadDockerImageClicked" text="Load Docker Image" VBox.vgrow="NEVER" />
+            <HBox alignment="CENTER" VBox.vgrow="NEVER">
+               <children>
+                  <Button id="btn_load_docker_image" fx:id="btnLoadDockerImage" disable="true" mnemonicParsing="false" onAction="#onLoadDockerImageClicked" text="Load Docker Image" />
+               </children>
+            </HBox>
             <HBox alignment="CENTER_RIGHT" maxHeight="36.0" maxWidth="1.7976931348623157E308" prefHeight="36.0" VBox.vgrow="NEVER">
                <children>
                   <Button fx:id="btnNext" disable="true" mnemonicParsing="false" onAction="#onNextBtnClicked" text="Next" />
                </children>
             </HBox>
          </children>
-         <padding>
-            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-         </padding>
       </VBox>
    </children>
 </AnchorPane>

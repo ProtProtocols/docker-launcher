@@ -13,28 +13,28 @@
 
 <AnchorPane maxHeight="900.0" maxWidth="700.0" minHeight="287.0" minWidth="447.0" prefHeight="287.0" prefWidth="447.0" xmlns="http://javafx.com/javafx/8.0.181" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.protprotocols.dockerlauncher.Controller.DlgImageSettingsController">
    <children>
-      <VBox prefHeight="400.0" prefWidth="600.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <VBox prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <HBox alignment="CENTER_LEFT" maxHeight="40.0" minHeight="-Infinity" prefHeight="40.0" prefWidth="200.0" spacing="10.0" VBox.vgrow="NEVER">
+            <HBox alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" VBox.vgrow="NEVER">
                <children>
                   <Label text="Protocol Image to start:" />
-                  <ChoiceBox fx:id="protocolList" maxWidth="1.7976931348623157E308" prefHeight="26.0" prefWidth="262.0" HBox.hgrow="NEVER" />
+                  <ChoiceBox fx:id="protocolList" maxWidth="1.7976931348623157E308" prefWidth="262.0" HBox.hgrow="SOMETIMES" />
                </children>
             </HBox>
-            <HBox alignment="CENTER_LEFT" maxHeight="40.0" minHeight="-Infinity" prefHeight="40.0" prefWidth="200.0" spacing="10.0">
+            <HBox alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308">
                <children>
                   <Label maxWidth="-Infinity" text="Working Directory:" HBox.hgrow="ALWAYS" />
-                  <TextField fx:id="workingDirectoryPath" editable="false" maxWidth="1.7976931348623157E308" prefHeight="26.0" prefWidth="207.0" />
+                  <TextField fx:id="workingDirectoryPath" editable="false" maxWidth="1.7976931348623157E308" HBox.hgrow="SOMETIMES" />
                   <Button fx:id="btnBrowseWorkdir" maxWidth="-Infinity" mnemonicParsing="false" onAction="#onBrowseWorkingDirectory" text="Browse" />
                </children>
             </HBox>
-            <HBox alignment="CENTER_LEFT" spacing="10.0">
+            <HBox alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308">
                <children>
-                  <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="16.0" prefWidth="159.0" text="Docker container URL:" />
-                  <Hyperlink fx:id="containerURL" maxWidth="1.7976931348623157E308" prefHeight="24.0" prefWidth="280.0" HBox.hgrow="NEVER" />
+                  <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="Docker container URL:" />
+                  <Hyperlink fx:id="containerURL" maxWidth="1.7976931348623157E308" HBox.hgrow="NEVER" />
                </children>
             </HBox>
-            <TextArea fx:id="statusTextArea" maxHeight="1.7976931348623157E308" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+            <TextArea fx:id="statusTextArea" editable="false" maxHeight="1.7976931348623157E308" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
             <HBox alignment="CENTER_RIGHT" maxHeight="36.0" maxWidth="1.7976931348623157E308" prefHeight="36.0" VBox.vgrow="NEVER">
                <children>
                   <Button fx:id="btnNext" disable="true" mnemonicParsing="false" onAction="#onStartImageClicked" text="Launch Image" />
