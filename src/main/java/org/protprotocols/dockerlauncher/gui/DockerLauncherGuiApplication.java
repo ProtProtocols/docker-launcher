@@ -7,14 +7,13 @@ import javafx.scene.Scene;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import org.protprotocols.dockerlauncher.Controller.DlgLoadImageController;
+import org.protprotocols.dockerlauncher.controller.DlgLoadImageController;
 import org.protprotocols.dockerlauncher.util.Constants;
 import org.protprotocols.dockerlauncher.util.Settings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
-import java.util.Set;
 
 public class DockerLauncherGuiApplication extends Application {
     private final static Logger log = LoggerFactory.getLogger(DockerLauncherGuiApplication.class);

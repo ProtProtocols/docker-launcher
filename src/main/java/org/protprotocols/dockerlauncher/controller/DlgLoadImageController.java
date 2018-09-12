@@ -1,4 +1,4 @@
-package org.protprotocols.dockerlauncher.Controller;
+package org.protprotocols.dockerlauncher.controller;
 
 import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.DockerClient;
@@ -13,7 +13,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
-import org.protprotocols.dockerlauncher.Tasks.DockerDownloadImageTask;
+import org.protprotocols.dockerlauncher.tasks.DockerDownloadImageTask;
 import org.protprotocols.dockerlauncher.util.Constants;
 import org.protprotocols.dockerlauncher.util.Settings;
 import org.slf4j.Logger;
@@ -35,9 +35,6 @@ public class DlgLoadImageController extends DialogController {
 
     @FXML
     public void initialize() throws Exception {
-        // TODO: remove after debug
-        btnNext.setDisable(false);
-
         // connect to docker
         final DockerClient docker = DefaultDockerClient.fromEnv().build();
 

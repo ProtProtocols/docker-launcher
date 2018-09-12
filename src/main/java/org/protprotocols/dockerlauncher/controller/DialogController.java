@@ -1,4 +1,4 @@
-package org.protprotocols.dockerlauncher.Controller;
+package org.protprotocols.dockerlauncher.controller;
 
 import javafx.stage.Stage;
 

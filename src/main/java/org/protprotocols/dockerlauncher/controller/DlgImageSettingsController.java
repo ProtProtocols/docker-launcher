@@ -1,8 +1,7 @@
-package org.protprotocols.dockerlauncher.Controller;
+package org.protprotocols.dockerlauncher.controller;
 
 import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.DockerClient;
-import com.spotify.docker.client.LogStream;
 import com.spotify.docker.client.messages.*;
 import javafx.application.HostServices;
 import javafx.collections.FXCollections;
@@ -14,7 +13,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.DirectoryChooser;
-import org.protprotocols.dockerlauncher.Tasks.ListenContainerTask;
+import org.protprotocols.dockerlauncher.events.DockerLauncherEventTypes;
+import org.protprotocols.dockerlauncher.tasks.ListenContainerTask;
 import org.protprotocols.dockerlauncher.gui.DockerLauncherGuiApplication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -141,7 +141,10 @@ public class DlgImageSettingsController extends DialogController {
             // change the button label
             btnNext.setText("Stop container");
 
-            ListenContainerTask task = new ListenContainerTask(statusTextArea, runningContainerId);
+            ListenContainerTask task = new ListenContainerTask(runningContainerId);
+            task.addEventHandler(DockerLauncherEventTypes.CONTAINER_LOG, event -> {
+                statusTextArea.appendText(event.getLogMessage());
+            });
             containerListenerThread = new Thread(task);
             containerListenerThread.start();
 
