@@ -1,38 +1,43 @@
-package org.protprotocols.dockerlauncher.Tasks;
+package org.protprotocols.dockerlauncher.tasks;
 
 import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.LogStream;
+import javafx.application.Platform;
 import javafx.concurrent.Task;
-import javafx.scene.control.TextArea;
+import org.protprotocols.dockerlauncher.events.ContainerLogEvent;
+import org.protprotocols.dockerlauncher.events.DockerLauncherEventTypes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 
-public class ListenContainerTask extends Task {
-    private final static Logger log = Logger.getLogger(ListenContainerTask.class.getName());
-    private final TextArea textArea;
+public class ListenContainerTask extends Task<Void> {
+    private final static Logger log = LoggerFactory.getLogger(ListenContainerTask.class);
     private final String containerId;
 
-    public ListenContainerTask(TextArea textArea, String containerId) {
-        this.textArea = textArea;
+    public ListenContainerTask(String containerId) {
         this.containerId = containerId;
     }
 
     @Override
-    protected Object call() throws Exception {
-        log.info("Starting to listen for container output...");
+    protected Void call() {
+        log.debug("Starting to listen for container output...");
         int nPreviousLines = 0;
 
         try (DockerClient docker = DefaultDockerClient.fromEnv().build()) {
             while (true) {
                 if (isCancelled() || isDone()) {
-                    log.info("Listening task cancelled");
+                    log.debug("Listening task cancelled");
                     return null;
                 }
 
-                TimeUnit.MILLISECONDS.sleep(300);
+                try {
+                    Thread.sleep(300);
+                } catch (InterruptedException e) {
+                    log.debug("Listening task cancelled");
+                    return null;
+                }
 
                 try (LogStream stream = docker.logs(containerId, DockerClient.LogsParam.stdout(), DockerClient.LogsParam.stderr())) {
                     final String logs;
@@ -49,13 +54,17 @@ public class ListenContainerTask extends Task {
                     filteredLog = Arrays.copyOfRange(filteredLog, nPreviousLines, nLength);
                     nPreviousLines = nLength;
 
+                    final String logMessage = String.join("\n", filteredLog) + "\n";
+
                     if (filteredLog.length > 0) {
-                        textArea.appendText(String.join("\n", filteredLog));
+                        Platform.runLater(() ->
+                                fireEvent(new ContainerLogEvent(DockerLauncherEventTypes.CONTAINER_LOG, logMessage)));
                     }
                 }
             }
         } catch (Exception e) {
-            log.warning("Listening thread failed: " + e.getMessage());
+            log.warn("Listening thread failed: " + e.getMessage());
+            e.printStackTrace();
         }
 
         return null;

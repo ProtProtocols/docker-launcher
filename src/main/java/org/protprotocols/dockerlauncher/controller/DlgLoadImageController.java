@@ -1,4 +1,4 @@
-package org.protprotocols.dockerlauncher.Controller;
+package org.protprotocols.dockerlauncher.controller;
 
 import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.DockerClient;
@@ -6,24 +6,32 @@ import com.spotify.docker.client.exceptions.DockerCertificateException;
 import com.spotify.docker.client.exceptions.DockerException;
 import com.spotify.docker.client.messages.Image;
 import com.spotify.docker.client.messages.Version;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextArea;
-import org.protprotocols.dockerlauncher.Tasks.DockerDownloadImageTask;
+import org.protprotocols.dockerlauncher.tasks.DockerDownloadImageTask;
 import org.protprotocols.dockerlauncher.util.Constants;
+import org.protprotocols.dockerlauncher.util.Settings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class DlgLoadImageController extends DialogController {
-    private final static Logger LOGGER = Logger.getLogger(DlgLoadImageController.class.getName());
+    private final static Logger log = LoggerFactory.getLogger(DlgLoadImageController.class);
+    @FXML private ProgressIndicator progressIndicator;
+    @FXML private ComboBox imageVersionBox;
     @FXML private TextArea statusTextArea;
     @FXML private Button btnLoadDockerImage;
     @FXML private Button btnNext;
@@ -33,18 +41,18 @@ public class DlgLoadImageController extends DialogController {
 
     @FXML
     public void initialize() throws Exception {
-        // connect to docker
-        final DockerClient docker = DefaultDockerClient.fromEnv().build();
-
         // make sure docker is running and responding
-        try {
+        try (DockerClient docker = DefaultDockerClient.fromEnv().build()){
+            // inititalize the image version drop-down
+            initImageVersions();
+
             final String pingResponse = docker.ping();
 
             if (pingResponse.equals("OK")) {
                 statusTextArea.appendText("Successfully connected to docker deamon.\n");
             } else {
                 statusTextArea.appendText("Error: Failed to ping docker daemon.\n");
-                LOGGER.severe("Failed to ping docker deamon. Ping response = " + pingResponse);
+                log.error("Failed to ping docker deamon. Ping response = " + pingResponse);
                 return;
             }
 
@@ -57,9 +65,8 @@ public class DlgLoadImageController extends DialogController {
             // get the list of available images
             statusTextArea.appendText("\nGetting list of available images...\n");
 
-
             // get all labels
-            updateInstalledProtocols(docker);
+            updateInstalledProtocols(docker, properties.getProperty(Constants.PROPERTY_IMAGE_NAME));
 
             if (installedProtocols.size() == 0) {
                 statusTextArea.appendText("Protocol image not found.\n  Please click the button to download it.");
@@ -72,7 +79,7 @@ public class DlgLoadImageController extends DialogController {
             }
 
         } catch (DockerException exception) {
-            LOGGER.severe(exception.toString());
+            log.error(exception.toString());
             statusTextArea.appendText("Error:\n");
             if (exception.toString().contains("Permission denied")) {
                 statusTextArea.appendText("  Missing permission to connect docker service.\nPlease run this application as super user.");
@@ -81,18 +88,30 @@ public class DlgLoadImageController extends DialogController {
                         "To install Docker visit https://store.docker.com\nOnce Docker is installed and running, please re-start this application.\n");
             }
 
-
+            // disable the remaining controls
+            btnLoadDockerImage.setDisable(true);
+            imageVersionBox.setDisable(true);
         }
-
-        docker.close();
     }
 
-    private void updateInstalledProtocols(DockerClient docker) throws DockerException, InterruptedException {
+    /**
+     * Initializes the drop-down list that shows the image versions
+     */
+    private void initImageVersions() {
+        // load the versions from the properties
+        List<String> versions = Arrays.stream(properties.getProperty(Constants.PROPERTY_IMAGE_VERSIONS).split(","))
+                .map(String::trim)
+                .collect(Collectors.toList());
+        imageVersionBox.setItems(FXCollections.observableArrayList(versions));
+        imageVersionBox.setValue(versions.get(0));
+    }
+
+    private void updateInstalledProtocols(DockerClient docker, String imageName) throws DockerException, InterruptedException {
         final List<Image> images = docker.listImages();
 
         installedProtocols = images.stream()
                 .filter(image -> image.repoTags() != null)
-                .map(image -> image.repoTags().stream().filter(s -> s.contains("veitveit/isolabeledprotocol")).findFirst())
+                .map(image -> image.repoTags().stream().filter(s -> s.contains(imageName)).findFirst())
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList());
@@ -106,27 +125,44 @@ public class DlgLoadImageController extends DialogController {
     @FXML
     protected void onLoadDockerImageClicked(ActionEvent actionEvent) throws Exception {
         statusTextArea.appendText("\nDownloading protocol image from Docker Hub...\n");
-        btnLoadDockerImage.disableProperty().setValue(true);
-        btnLoadDockerImage.setText("Downloading...");
-
 
         // get the image
-        LOGGER.info("Starting download of docker image...");
+        log.info("Starting download of docker image...");
 
-        DockerDownloadImageTask task = new DockerDownloadImageTask("veitveit/isolabeledprotocol:latest", this);
+        String imageName = properties.getProperty(Constants.PROPERTY_IMAGE_NAME) + ":" + imageVersionBox.getValue();
+
+        DockerDownloadImageTask task = new DockerDownloadImageTask(imageName, this);
         imageDownloadThread = new Thread(task);
         imageDownloadThread.start();
+
+        imageDownloadInProgress(true);
     }
 
-    public void dockerImageDownloadComplete() throws DockerCertificateException, DockerException, InterruptedException {
-        statusTextArea.appendText("  Image download complete.");
-        setNextStepPossible();
-        updateInstalledProtocols(DefaultDockerClient.fromEnv().build());
+    private void imageDownloadInProgress(boolean inProgress) {
+        btnLoadDockerImage.setDisable(inProgress);
+        imageVersionBox.setDisable(inProgress);
+        progressIndicator.setVisible(inProgress);
+    }
+
+    public void dockerImageDownloadComplete() {
+        imageDownloadInProgress(false);
+
+        try {
+            statusTextArea.appendText("  Image download complete.");
+            updateInstalledProtocols(DefaultDockerClient.fromEnv().build(), properties.getProperty(Constants.PROPERTY_IMAGE_NAME));
+            setNextStepPossible();
+        } catch (Exception e) {
+            log.error("Failed to update image list\n" + e.getMessage());
+            statusTextArea.appendText("  Failed to update list of images.\n");
+        }
     }
 
     public void dockerImageDownloadFailed(Exception e) {
+        imageDownloadInProgress(false);
+
         statusTextArea.appendText("  Image download failed.\n");
         statusTextArea.appendText("  " + e.getMessage() + "\n");
+        log.error("Failed to download image.\n" + e.getMessage());
     }
 
     @FXML
@@ -139,7 +175,8 @@ public class DlgLoadImageController extends DialogController {
         controller.setPrimaryStage(primaryStage);
 
         // create the application window
-        Scene scene = new Scene(root, 600, 400);
+        Scene scene = new Scene(root, Settings.getSceneWidth(), Settings.getSceneHeight());
+        scene.getStylesheets().addAll(Settings.getCss());
         primaryStage.setScene(scene);
         primaryStage.show();
     }

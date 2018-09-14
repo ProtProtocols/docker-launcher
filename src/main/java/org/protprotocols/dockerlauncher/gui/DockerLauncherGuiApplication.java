@@ -4,16 +4,19 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import org.protprotocols.dockerlauncher.Controller.DlgLoadImageController;
+import org.protprotocols.dockerlauncher.controller.DlgLoadImageController;
 import org.protprotocols.dockerlauncher.util.Constants;
+import org.protprotocols.dockerlauncher.util.Settings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.logging.Logger;
+import javax.swing.*;
 
 public class DockerLauncherGuiApplication extends Application {
-    private final static Logger LOGGER = Logger.getLogger(DockerLauncherGuiApplication.class.getName());
+    private final static Logger log = LoggerFactory.getLogger(DockerLauncherGuiApplication.class);
 
     public void start(Stage primaryStage) throws Exception {
         primaryStage.setMaximized(false);
@@ -36,7 +39,7 @@ public class DockerLauncherGuiApplication extends Application {
         showLoadImage(primaryStage);
     }
 
-    private void showLoadImage(Stage primaryStage) throws IOException {
+    private void showLoadImage(Stage primaryStage) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(Constants.FXML_DLG_LOAD_IMAGE));
         Parent root = loader.load();
 
@@ -44,13 +47,35 @@ public class DockerLauncherGuiApplication extends Application {
         controller.setPrimaryStage(primaryStage);
 
         // create the application window
-        Scene scene = new Scene(root, 600, 400);
+        Scene scene = new Scene(root, Settings.getSceneWidth(), Settings.getSceneHeight());
+        scene.getStylesheets().add(Settings.getCss());
         primaryStage.setTitle("ProtProtocols Protocol Launcher");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
     public static void main(String[] args) {
+        try {
+            // set the look and feel
+            UIManager.setLookAndFeel(
+                    UIManager.getSystemLookAndFeelClassName());
+
+            // set the css to use
+            double dpi = Screen.getPrimary().getDpi();
+            log.debug("Detected resolution: " + String.valueOf(dpi) + " dpi");
+
+            if (dpi >= Constants.HIGH_DPI) {
+                Settings.setCss(Constants.HIGH_RES_CSS);
+                Settings.setSceneHeight(Constants.HIGH_RES_HEIGHT);
+                Settings.setSceneWidth(Constants.HIGH_RES_WIDTH);
+            } else {
+                Settings.setCss(Constants.LOW_RES_CSS);
+                Settings.setSceneHeight(Constants.LOW_RES_HEIGHT);
+                Settings.setSceneWidth(Constants.LOW_RES_WIDTH);
+            }
+        } catch (Exception e) {
+            log.warn("Failed to set look and feel: " + e.getMessage());
+        }
         launch(args);
     }
 
