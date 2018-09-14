@@ -2,6 +2,7 @@ package org.protprotocols.dockerlauncher.tasks;
 
 import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.DockerClient;
+import com.spotify.docker.client.messages.RegistryAuth;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import org.protprotocols.dockerlauncher.controller.DlgLoadImageController;
@@ -19,7 +20,7 @@ public class DockerDownloadImageTask extends Task<Void> {
     @Override
     protected Void call() {
         try (DockerClient docker = DefaultDockerClient.fromEnv().build()) {
-            docker.pull(imageName);
+            docker.pull(imageName, RegistryAuth.builder().build());
             Platform.runLater(() -> controller.dockerImageDownloadComplete());
         } catch (Exception e) {
             Platform.runLater(() -> controller.dockerImageDownloadFailed(e));
