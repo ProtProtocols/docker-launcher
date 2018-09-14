@@ -14,3 +14,9 @@ ProtProtocol images.
   * Download the current version from the [releases](https://github.com/ProtProtocols/docker-launcher/releases). 
   * Unpack the zip file to any directory
   * Simply launch the docker-launcher-[VERSION].jar file (double click or use `java -jar /path/to/docker-launcher-[VERSION].jar)
+
+## Changes
+
+### Version 0.2
+
+  * Added functionality to select which image version to download and / or update
