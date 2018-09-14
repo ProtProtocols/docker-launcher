@@ -2,10 +2,11 @@ package org.protprotocols.dockerlauncher.controller;
 
 import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.DockerClient;
-import com.spotify.docker.client.exceptions.DockerCertificateException;
 import com.spotify.docker.client.exceptions.DockerException;
 import com.spotify.docker.client.messages.Image;
 import com.spotify.docker.client.messages.Version;
+import javafx.application.Platform;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -23,6 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -140,6 +143,16 @@ public class DlgLoadImageController extends DialogController {
         String imageName = properties.getProperty(Constants.PROPERTY_IMAGE_NAME) + ":" + imageVersionBox.getValue();
 
         DockerDownloadImageTask task = new DockerDownloadImageTask(imageName, this);
+        if (progressIndicator.progressProperty().isBound()) {
+            progressIndicator.progressProperty().unbind();
+        }
+        progressIndicator.progressProperty().bind(task.progressProperty());
+
+        // display any message
+        task.messageProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+                Platform.runLater(() -> statusTextArea.appendText("  " + newValue + "\n"));
+        });
+
         imageDownloadThread = new Thread(task);
         imageDownloadThread.start();
 
@@ -171,6 +184,10 @@ public class DlgLoadImageController extends DialogController {
         statusTextArea.appendText("  Image download failed.\n");
         statusTextArea.appendText("  " + e.getMessage() + "\n");
         log.error("Failed to download image.\n" + e.getMessage());
+        // get the stack trace as string
+        StringWriter writer = new StringWriter();
+        e.printStackTrace(new PrintWriter(writer));
+        log.debug(writer.toString());
     }
 
     @FXML

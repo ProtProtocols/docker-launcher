@@ -20,7 +20,14 @@ public class DockerDownloadImageTask extends Task<Void> {
     @Override
     protected Void call() {
         try (DockerClient docker = DefaultDockerClient.fromEnv().build()) {
-            docker.pull(imageName, RegistryAuth.builder().build());
+            docker.pull(imageName, RegistryAuth.builder().build(), message -> {
+                updateMessage(message.status());
+                if (message.progressDetail() != null) {
+                    updateProgress(message.progressDetail().current(), message.progressDetail().total());
+                }
+            });
+            updateProgress(100, 100);
+            updateMessage("Download complete");
             Platform.runLater(() -> controller.dockerImageDownloadComplete());
         } catch (Exception e) {
             Platform.runLater(() -> controller.dockerImageDownloadFailed(e));

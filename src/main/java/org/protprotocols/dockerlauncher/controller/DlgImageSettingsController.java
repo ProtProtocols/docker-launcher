@@ -2,20 +2,23 @@ package org.protprotocols.dockerlauncher.controller;
 
 import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.DockerClient;
-import com.spotify.docker.client.messages.*;
+import com.spotify.docker.client.messages.ContainerConfig;
+import com.spotify.docker.client.messages.ContainerCreation;
+import com.spotify.docker.client.messages.HostConfig;
+import com.spotify.docker.client.messages.PortBinding;
 import javafx.application.HostServices;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
-import javafx.scene.control.*;
 import javafx.scene.control.Button;
+import javafx.scene.control.*;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.DirectoryChooser;
 import org.protprotocols.dockerlauncher.events.DockerLauncherEventTypes;
-import org.protprotocols.dockerlauncher.tasks.ListenContainerTask;
 import org.protprotocols.dockerlauncher.gui.DockerLauncherGuiApplication;
+import org.protprotocols.dockerlauncher.tasks.ListenContainerTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
