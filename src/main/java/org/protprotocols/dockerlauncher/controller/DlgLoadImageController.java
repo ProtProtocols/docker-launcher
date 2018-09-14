@@ -41,6 +41,8 @@ public class DlgLoadImageController extends DialogController {
 
     @FXML
     public void initialize() throws Exception {
+        log.debug("Detecting OS for error message: " + System.getProperty("os.name"));
+
         // make sure docker is running and responding
         try (DockerClient docker = DefaultDockerClient.fromEnv().build()){
             // inititalize the image version drop-down
@@ -86,6 +88,12 @@ public class DlgLoadImageController extends DialogController {
             } else {
                 statusTextArea.appendText("  Failed to connect to docker service.\nPlease make sure Docker is installed and running.\n\n" +
                         "To install Docker visit https://store.docker.com\nOnce Docker is installed and running, please re-start this application.\n");
+            }
+
+            // add special windows message
+            if (System.getProperty("os.name").toLowerCase().contains("win")) {
+                statusTextArea.appendText("\nIf Docker is already running, make sure to enable the option \"Expose " +
+                        "daemon on tcp://localhost:2375\" in your Docker settings.");
             }
 
             // disable the remaining controls
