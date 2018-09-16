@@ -12,7 +12,7 @@ public abstract class DialogController {
     protected DialogController() {
         properties = new Properties();
         try {
-            properties.load(getClass().getClassLoader().getResourceAsStream("docker_image.properties"));
+            properties.load(getClass().getClassLoader().getResourceAsStream("docker_launcher.properties"));
         }
         catch (IOException e) {
             // this should never happen

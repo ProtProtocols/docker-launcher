@@ -1,5 +1,9 @@
 package org.protprotocols.dockerlauncher.controller;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.exceptions.DockerException;
@@ -17,15 +21,17 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextArea;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.protprotocols.dockerlauncher.tasks.DockerDownloadImageTask;
 import org.protprotocols.dockerlauncher.util.Constants;
 import org.protprotocols.dockerlauncher.util.Settings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.*;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -45,6 +51,19 @@ public class DlgLoadImageController extends DialogController {
     @FXML
     public void initialize() throws Exception {
         log.debug("Detecting OS for error message: " + System.getProperty("os.name"));
+        statusTextArea.appendText("docker-launcher version " + properties.getProperty("version") + "\n\n");
+
+        try {
+            String newerVersion = isNewVersionAvailable();
+            if (newerVersion != null) {
+                log.debug(newerVersion + " available for download.");
+                statusTextArea.appendText("Version " + newerVersion + " available for download\n  To update visit\n" +
+                        properties.getProperty("download_url") + "\n-------------------------------------\n\n");
+            }
+        }
+        catch (Exception e) {
+            log.debug("Failed to check for new version: " + e.getMessage());
+        }
 
         // make sure docker is running and responding
         try (DockerClient docker = DefaultDockerClient.fromEnv().build()){
@@ -103,6 +122,38 @@ public class DlgLoadImageController extends DialogController {
             btnLoadDockerImage.setDisable(true);
             imageVersionBox.setDisable(true);
         }
+    }
+
+    private String isNewVersionAvailable() throws IOException {
+        // check if a new version is available
+        String currentVersion = properties.getProperty("version");
+        log.debug("Running version " + currentVersion);
+
+        // get the latest release
+        URL url = new URL(properties.getProperty("release_url"));
+        URLConnection request = url.openConnection();
+        request.connect();
+
+        // Convert to a JSON object to print data
+        JsonParser jp = new JsonParser(); //from gson
+        JsonElement root = jp.parse(new InputStreamReader((InputStream) request.getContent())); //Convert the input stream to a json element
+        JsonArray releases = root.getAsJsonArray();
+
+        List<String> availableReleases = new ArrayList<>(releases.size());
+
+        for (JsonElement release : releases) {
+            log.debug("Found release " + release.getAsJsonObject().get("tag_name"));
+            availableReleases.add(release.getAsJsonObject().get("tag_name").getAsString());
+        }
+
+        DefaultArtifactVersion runningVersion = new DefaultArtifactVersion(currentVersion);
+        List<DefaultArtifactVersion> availableVersions = availableReleases.stream().map(DefaultArtifactVersion::new).sorted().collect(Collectors.toList());
+
+        if (availableVersions.get(availableVersions.size() - 1).compareTo(runningVersion) > 0) {
+            return availableVersions.get(availableVersions.size() - 1).toString();
+        }
+
+        return null;
     }
 
     /**
