@@ -2,31 +2,22 @@ package org.protprotocols.dockerlauncher.controller;
 
 import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.DockerClient;
-import com.spotify.docker.client.messages.ContainerConfig;
-import com.spotify.docker.client.messages.ContainerCreation;
-import com.spotify.docker.client.messages.HostConfig;
-import com.spotify.docker.client.messages.PortBinding;
-import javafx.application.HostServices;
+import com.spotify.docker.client.messages.*;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
-import javafx.scene.control.Button;
 import javafx.scene.control.*;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 import javafx.stage.DirectoryChooser;
 import org.protprotocols.dockerlauncher.events.DockerLauncherEventTypes;
-import org.protprotocols.dockerlauncher.gui.DockerLauncherGuiApplication;
 import org.protprotocols.dockerlauncher.tasks.ListenContainerTask;
+import org.protprotocols.dockerlauncher.tasks.OpenDockerPageTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -72,6 +63,7 @@ public class DlgImageSettingsController extends DialogController {
         }
     }
 
+    @FXML
     public void onStartImageClicked(ActionEvent actionEvent) throws Exception {
         // set the cursor to wait
         primaryStage.getScene().setCursor(Cursor.WAIT);
@@ -119,9 +111,7 @@ public class DlgImageSettingsController extends DialogController {
             // Create container with exposed ports
             final ContainerConfig containerConfig = ContainerConfig.builder()
                     .hostConfig(hostConfig)
-                    // TODO: get selected image
                     .image(protocolList.getValue().toString()).exposedPorts(exposedPorts)
-                    //.cmd("sh", "-c", "while :; do sleep 1; done")
                     .build();
 
             final ContainerCreation creation = docker.createContainer(containerConfig);
@@ -144,6 +134,7 @@ public class DlgImageSettingsController extends DialogController {
             // change the button label
             btnNext.setText("Stop container");
 
+            // get the container output
             ListenContainerTask task = new ListenContainerTask(runningContainerId);
             task.addEventHandler(DockerLauncherEventTypes.CONTAINER_LOG, event -> {
                 statusTextArea.appendText(event.getLogMessage());
@@ -151,28 +142,22 @@ public class DlgImageSettingsController extends DialogController {
             containerListenerThread = new Thread(task);
             containerListenerThread.start();
 
+            // get the container IP - necessary for Docker toolbox
+            final ContainerInfo containerInfo = docker.inspectContainer(runningContainerId);
+            log.debug("Container ip = " + containerInfo.networkSettings().ipAddress());
+
             // open the website with a short delay
             // TODO: check that the server is running
             TimeUnit.SECONDS.sleep(1);
-            String dockerUrl = "http://localhost:" + String.valueOf(port);
+            String dockerUrl = "http://" + containerInfo.networkSettings().ipAddress() + ":" + String.valueOf(port);
             log.info("Openging web browser for " + dockerUrl);
 
-            boolean browserLaunched = false;
-            if (Desktop.isDesktopSupported()) {
-                Desktop desktop = Desktop.getDesktop();
-                if (desktop.isSupported(Desktop.Action.BROWSE)) {
-                    log.info("Using desktop.browse");
-                    desktop.browse(new URI(dockerUrl));
-                    browserLaunched = true;
-                }
-            }
-            if (!browserLaunched) {
-                HostServices hostServices = new DockerLauncherGuiApplication().getHostServices();
-                hostServices.showDocument(dockerUrl);
+            containerURL.setText(dockerUrl);
 
-            }
-
-            containerURL.setText("http://localhost:" + String.valueOf(port));
+            OpenDockerPageTask openDockerPageTask = new OpenDockerPageTask(dockerUrl);
+            Thread openThread = new Thread(openDockerPageTask);
+            openThread.setDaemon(true);
+            openThread.start();
 
             // Exec command inside running container with attached STDOUT and STDERR
             /*
