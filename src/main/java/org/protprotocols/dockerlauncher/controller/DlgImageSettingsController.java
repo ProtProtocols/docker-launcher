@@ -85,13 +85,15 @@ public class DlgImageSettingsController extends DialogController {
 
                 return;
             }
-            int port = launchDockerImage(docker);
-
-            // Show that docker is running
+            // Show that docker is starting
             statusTextArea.clear();
             statusTextArea.appendText("Starting docker container....\n");
             statusTextArea.appendText("  Image is " + protocolList.getValue().toString() + "\n");
             statusTextArea.appendText("  Working directory set to " + workingDirectoryPath.getText() + "\n");
+
+            // launch the image
+            int port = launchDockerImage(docker);
+
             statusTextArea.appendText("  Using port " + String.valueOf(port) + "\n\n");
 
             // disable all controls
