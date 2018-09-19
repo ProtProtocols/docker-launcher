@@ -3,6 +3,7 @@ package org.protprotocols.dockerlauncher.controller;
 import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.messages.*;
+import javafx.application.HostServices;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -10,8 +11,10 @@ import javafx.scene.Cursor;
 import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
 import org.protprotocols.dockerlauncher.events.DockerLauncherEventTypes;
+import org.protprotocols.dockerlauncher.gui.DockerLauncherGuiApplication;
 import org.protprotocols.dockerlauncher.tasks.ListenContainerTask;
 import org.protprotocols.dockerlauncher.tasks.OpenDockerPageTask;
+import org.protprotocols.dockerlauncher.util.LoggerHelperFunctions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +25,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 public class DlgImageSettingsController extends DialogController {
     private final Logger log = LoggerFactory.getLogger(DlgImageSettingsController.class);
@@ -83,39 +85,7 @@ public class DlgImageSettingsController extends DialogController {
 
                 return;
             }
-
-            // Bind container ports to host ports
-            final Map<String, List<PortBinding>> portBindings = new HashMap<>();
-
-            // Bind container jupyter port to an automatically allocated available host port.
-            List<PortBinding> hostPort = new ArrayList<>();
-            int port = 8888;
-
-            while (!isPortAvailable(port)) {
-                port++;
-            }
-
-            hostPort.add(PortBinding.create("0.0.0.0", String.valueOf(port)));
-            portBindings.put("8888", hostPort);
-            String[] exposedPorts = {"8888"};
-
-            final HostConfig hostConfig = HostConfig.builder()
-                    .portBindings(portBindings)
-                    .appendBinds(HostConfig.Bind
-                            .from(workingDirectoryPath.getText())
-                            .to("/data")
-                            .readOnly(false)
-                            .build())
-                    .build();
-
-            // Create container with exposed ports
-            final ContainerConfig containerConfig = ContainerConfig.builder()
-                    .hostConfig(hostConfig)
-                    .image(protocolList.getValue().toString()).exposedPorts(exposedPorts)
-                    .build();
-
-            final ContainerCreation creation = docker.createContainer(containerConfig);
-            runningContainerId = creation.id();
+            int port = launchDockerImage(docker);
 
             // Show that docker is running
             statusTextArea.clear();
@@ -128,9 +98,6 @@ public class DlgImageSettingsController extends DialogController {
             btnBrowseWorkdir.setDisable(true);
             protocolList.setDisable(true);
 
-            // Start container
-            docker.startContainer(runningContainerId);
-
             // change the button label
             btnNext.setText("Stop container");
 
@@ -142,38 +109,114 @@ public class DlgImageSettingsController extends DialogController {
             containerListenerThread = new Thread(task);
             containerListenerThread.start();
 
+            // TODO: The machine IP cannot be accessed under Windows 10..., but only localhost...
+
             // get the container IP - necessary for Docker toolbox
             final ContainerInfo containerInfo = docker.inspectContainer(runningContainerId);
             log.debug("Container ip = " + containerInfo.networkSettings().ipAddress());
 
-            // open the website with a short delay
-            // TODO: check that the server is running
-            TimeUnit.SECONDS.sleep(1);
-            String dockerUrl = "http://" + containerInfo.networkSettings().ipAddress() + ":" + String.valueOf(port);
-            log.info("Openging web browser for " + dockerUrl);
-
-            containerURL.setText(dockerUrl);
+            // open the website with a short delay using a separate task
+            // String dockerUrl = "http://" + containerInfo.networkSettings().ipAddress() + ":" + String.valueOf(port);
+            String dockerUrl = "http://localhost:" + String.valueOf(port);
 
             OpenDockerPageTask openDockerPageTask = new OpenDockerPageTask(dockerUrl);
             Thread openThread = new Thread(openDockerPageTask);
             openThread.setDaemon(true);
             openThread.start();
 
-            // Exec command inside running container with attached STDOUT and STDERR
-            /*
-            final String[] command = {"sh", "-c", "ls"};
-            final ExecCreation execCreation = docker.execCreate(
-                    id, command, DockerClient.ExecCreateParam.attachStdout(),
-                    DockerClient.ExecCreateParam.attachStderr());
-            final LogStream output = docker.execStart(execCreation.id());
-            final String execOutput = output.readFully();
-            */
+            containerURL.setText(dockerUrl);
         } catch (Exception e) {
-            statusTextArea.appendText("  Failed to launch docker image\n");
-            statusTextArea.appendText(e.getMessage() + "\n");
+            log.error("Failed to launched docker image: " + e.getMessage());
+            statusTextArea.appendText("  Failed to launch docker image:\n");
+
+            // check if we now why it failed
+            if (e.getMessage().toLowerCase().contains("driver failed programming external connectivity")) {
+                statusTextArea.appendText("  Docker failed to forward port.\n" +
+                        "Please restart the Docker service to solve this issue.\n" +
+                        "If this does not help, restart your computer as well.\n");
+            }
+            else {
+                statusTextArea.appendText("  " + e.getMessage() + "\n");
+                // only save the stack trace if we don't know what's going on
+                LoggerHelperFunctions.logStackTrace(log, e);
+            }
+
         } finally {
             primaryStage.getScene().setCursor(Cursor.DEFAULT);
         }
+    }
+
+    /**
+     * Launches the Docker image
+     */
+    private int launchDockerImage(DockerClient docker) throws Exception {
+        // Bind container ports to host ports
+        final Map<String, List<PortBinding>> portBindings = new HashMap<>();
+
+        // Bind container jupyter port to an automatically allocated available host port.
+        List<PortBinding> hostPort = new ArrayList<>();
+        int port = 8888;
+
+        while (!isPortAvailable(port)) {
+            port++;
+        }
+
+        hostPort.add(PortBinding.create("0.0.0.0", String.valueOf(port)));
+        portBindings.put("8888", hostPort);
+        String[] exposedPorts = {"8888"};
+
+        final HostConfig hostConfig = HostConfig.builder()
+                .portBindings(portBindings)
+                .appendBinds(HostConfig.Bind
+                        .from(workingDirectoryPath.getText())
+                        .to("/data")
+                        .readOnly(false)
+                        .build())
+                .build();
+
+        // Create container with exposed ports
+        final ContainerConfig containerConfig = ContainerConfig.builder()
+                .hostConfig(hostConfig)
+                .image(protocolList.getValue().toString()).exposedPorts(exposedPorts)
+                .build();
+
+        try {
+            log.debug("Creating docker container...");
+            final ContainerCreation creation = docker.createContainer(containerConfig);
+            runningContainerId = creation.id();
+            // Start container
+            log.debug("Starting docker container...");
+            docker.startContainer(runningContainerId);
+        } catch (Exception e) {
+            log.debug("Caught creation Exception: " + e.getMessage());
+
+            if (e.getMessage().toLowerCase().contains("firewall") || e.getMessage().toLowerCase().contains("drive")) {
+                log.info("Drive sharing is blocked by a firewall or has not been enabled, launching image without shared drives");
+                statusTextArea.appendText("  Drive sharing is blocked by a firewall or has not been enabled.\nLaunching image without shared drives...\n");
+                // TODO: add more verbose information about what it means to work without shared drives
+
+                // launch the container without any drive sharing
+                final HostConfig noDriveConfig = HostConfig.builder()
+                        .portBindings(portBindings)
+                        .build();
+
+                // Create container with exposed ports
+                final ContainerConfig noDriveContainerConfig = ContainerConfig.builder()
+                        .hostConfig(noDriveConfig)
+                        .image(protocolList.getValue().toString()).exposedPorts(exposedPorts)
+                        .build();
+
+                final ContainerCreation creation = docker.createContainer(noDriveContainerConfig);
+                runningContainerId = creation.id();
+                // Start container
+                docker.startContainer(runningContainerId);
+            } else {
+                log.debug("Error Message does not point to a firewall issues, re-throwing (" + e.getMessage() + ")");
+                throw e;
+            }
+        }
+
+        return port;
     }
 
     private static boolean isPortAvailable(int port) {
@@ -197,6 +240,15 @@ public class DlgImageSettingsController extends DialogController {
             btnNext.setDisable(false);
         } else {
             btnNext.setDisable(true);
+        }
+    }
+
+    public void onHyperlinkedClicked(ActionEvent actionEvent) {
+        String url = containerURL.getText();
+
+        if (url.trim().startsWith("http")) {
+            HostServices hostServices = new DockerLauncherGuiApplication().getHostServices();
+            hostServices.showDocument(url);
         }
     }
 }

@@ -2,7 +2,6 @@ package org.protprotocols.dockerlauncher.controller;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.DockerClient;
@@ -24,11 +23,14 @@ import javafx.scene.control.TextArea;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.protprotocols.dockerlauncher.tasks.DockerDownloadImageTask;
 import org.protprotocols.dockerlauncher.util.Constants;
+import org.protprotocols.dockerlauncher.util.LoggerHelperFunctions;
 import org.protprotocols.dockerlauncher.util.Settings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -54,6 +56,7 @@ public class DlgLoadImageController extends DialogController {
         statusTextArea.appendText("docker-launcher version " + properties.getProperty("version") + "\n\n");
 
         try {
+            // TODO: move this to a different thread
             String newerVersion = isNewVersionAvailable();
             if (newerVersion != null) {
                 log.debug(newerVersion + " available for download.");
@@ -235,10 +238,7 @@ public class DlgLoadImageController extends DialogController {
         statusTextArea.appendText("  Image download failed.\n");
         statusTextArea.appendText("  " + e.getMessage() + "\n");
         log.error("Failed to download image.\n" + e.getMessage());
-        // get the stack trace as string
-        StringWriter writer = new StringWriter();
-        e.printStackTrace(new PrintWriter(writer));
-        log.debug(writer.toString());
+        LoggerHelperFunctions.logStackTrace(log, e);
     }
 
     @FXML
