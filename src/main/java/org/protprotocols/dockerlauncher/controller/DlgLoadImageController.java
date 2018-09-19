@@ -197,15 +197,6 @@ public class DlgLoadImageController extends DialogController {
         String imageName = properties.getProperty(Constants.PROPERTY_IMAGE_NAME) + ":" + imageVersionBox.getValue();
 
         DockerDownloadImageTask task = new DockerDownloadImageTask(imageName, this);
-        if (progressIndicator.progressProperty().isBound()) {
-            progressIndicator.progressProperty().unbind();
-        }
-        progressIndicator.progressProperty().bind(task.progressProperty());
-
-        // display any message
-        task.messageProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
-                Platform.runLater(() -> statusTextArea.appendText("  " + newValue + "\n"));
-        });
 
         imageDownloadThread = new Thread(task);
         imageDownloadThread.start();
@@ -217,6 +208,9 @@ public class DlgLoadImageController extends DialogController {
         btnLoadDockerImage.setDisable(inProgress);
         imageVersionBox.setDisable(inProgress);
         progressIndicator.setVisible(inProgress);
+        if (inProgress) {
+            btnNext.setDisable(true);
+        }
     }
 
     public void dockerImageDownloadComplete() {

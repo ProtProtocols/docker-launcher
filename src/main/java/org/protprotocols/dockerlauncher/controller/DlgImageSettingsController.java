@@ -79,6 +79,11 @@ public class DlgImageSettingsController extends DialogController {
                 btnBrowseWorkdir.setDisable(false);
                 protocolList.setDisable(false);
 
+                if (workingDirectoryPath.getText().equals("-- DISABLED --")) {
+                    btnNext.setDisable(true);
+                    workingDirectoryPath.setText("");
+                }
+
                 primaryStage.getScene().setCursor(Cursor.DEFAULT);
 
                 containerURL.setText("");
@@ -195,6 +200,7 @@ public class DlgImageSettingsController extends DialogController {
             if (e.getMessage().toLowerCase().contains("firewall") || e.getMessage().toLowerCase().contains("drive")) {
                 log.info("Drive sharing is blocked by a firewall or has not been enabled, launching image without shared drives");
                 statusTextArea.appendText("  Drive sharing is blocked by a firewall or has not been enabled.\nLaunching image without shared drives...\n");
+                workingDirectoryPath.setText("-- DISABLED --");
                 // TODO: add more verbose information about what it means to work without shared drives
 
                 // launch the container without any drive sharing
