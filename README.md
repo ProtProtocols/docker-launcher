@@ -17,6 +17,17 @@ ProtProtocol images.
 
 ## Changes
 
+### Version 0.3
+
+  * Added support to launch image when Windows drive sharing fails
+  * Detects if a new version is available for download (necessary as protocol versions are hard-coded)
+  * Detects IP address of docker host when running Docker Toolbox
+
+**Bugfixes:**
+
+  * Fixed bug that prevented image download in Windows 10
+  * Fixed bug that prevented file sharing to work with Docker Toolbox
+
 ### Version 0.2
 
   * Added functionality to select which image version to download and / or update
