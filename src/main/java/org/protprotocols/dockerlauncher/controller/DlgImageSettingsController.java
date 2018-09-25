@@ -116,15 +116,9 @@ public class DlgImageSettingsController extends DialogController {
             containerListenerThread = new Thread(task);
             containerListenerThread.start();
 
-            // TODO: The machine IP cannot be accessed under Windows 10..., but only localhost...
-
-            // get the container IP - necessary for Docker toolbox
-            final ContainerInfo containerInfo = docker.inspectContainer(runningContainerId);
-            log.debug("Container ip = " + containerInfo.networkSettings().ipAddress());
-
             // open the website with a short delay using a separate task
-            // String dockerUrl = "http://" + containerInfo.networkSettings().ipAddress() + ":" + String.valueOf(port);
-            String dockerUrl = "http://localhost:" + String.valueOf(port);
+            String hostAddress = getHostAddress(docker);
+            String dockerUrl = "http://" + hostAddress + ":" + String.valueOf(port);
 
             OpenDockerPageTask openDockerPageTask = new OpenDockerPageTask(dockerUrl);
             Thread openThread = new Thread(openDockerPageTask);
@@ -150,6 +144,26 @@ public class DlgImageSettingsController extends DialogController {
 
         } finally {
             primaryStage.getScene().setCursor(Cursor.DEFAULT);
+        }
+    }
+
+    /**
+     * Determines the host address to use to access the running image.
+     * @param docker
+     * @return The host address as String.
+     * @throws Exception
+     */
+    private String getHostAddress(DockerClient docker) throws Exception {
+        // this only needs to be adapted when using Docker Toolbox
+        final Version dockerVersion = docker.version();
+
+        // docker-machine ip
+        if (dockerVersion.kernelVersion().contains("boot2docker")) {
+            Info systemInfo = docker.info();
+            log.debug("Adapting ip on DockerToolbox based on system info: " + systemInfo.noProxy());
+            return systemInfo.noProxy();
+        } else {
+            return "localhost";
         }
     }
 
@@ -249,6 +263,7 @@ public class DlgImageSettingsController extends DialogController {
             }
 
             // adapt the path
+            path = path.replaceFirst("C", "c");
             path = path.replaceAll(":", "");
             path = path.replaceAll("\\\\", "/");
             path = "/" + path;
