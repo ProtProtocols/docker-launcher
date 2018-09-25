@@ -42,8 +42,8 @@ public class DlgLoadImageController extends DialogController {
     private List<String> installedProtocols;
 
     @FXML
-    public void initialize() throws Exception {
-        log.debug("Detecting OS for error message: " + System.getProperty("os.name"));
+    public void initialize() {
+        log.debug("Detecting OS for error message: " + System.getProperty("os.name") + " - " + System.getProperty("os.version"));
         statusTextArea.appendText("docker-launcher version " + properties.getProperty("version") + "\n\n");
 
         // check if a new version is available
@@ -61,6 +61,7 @@ public class DlgLoadImageController extends DialogController {
                 connectToDocker();
             });
         });
+        task.setOnFailed(event -> Platform.runLater(this::connectToDocker));
         new Thread(task).start();
 
         statusTextArea.appendText("Checking for new version...\n");
@@ -161,6 +162,8 @@ public class DlgLoadImageController extends DialogController {
     private void setNextStepPossible() {
         btnNext.setDisable(false);
         statusTextArea.appendText("\nClick the \"Next\" button to continue...");
+        // scroll to the bottom of the field
+        Platform.runLater(() -> statusTextArea.setScrollTop(Double.MAX_VALUE));
     }
 
     @FXML

@@ -172,10 +172,12 @@ public class DlgImageSettingsController extends DialogController {
         portBindings.put("8888", hostPort);
         String[] exposedPorts = {"8888"};
 
+        String machinePath = getLocalWorkingDirectory(docker);
+
         final HostConfig hostConfig = HostConfig.builder()
                 .portBindings(portBindings)
                 .appendBinds(HostConfig.Bind
-                        .from(workingDirectoryPath.getText())
+                        .from(machinePath)
                         .to("/data")
                         .readOnly(false)
                         .build())
@@ -225,6 +227,36 @@ public class DlgImageSettingsController extends DialogController {
         }
 
         return port;
+    }
+
+    /**
+     * Returns the working directory the user selected and adapts the path
+     * if needed for Docker toolbox.
+     * @param docker
+     * @return
+     */
+    private String getLocalWorkingDirectory(DockerClient docker) throws Exception {
+        String path = workingDirectoryPath.getText();
+
+        final Version dockerVersion = docker.version();
+
+        if (dockerVersion.kernelVersion().contains("boot2docker")) {
+            log.debug("Using DockerToolbox - adpating path " + path);
+            // make sure the path is under C:\Users
+            if (!path.startsWith("C:\\User")) {
+                log.error("Invalid working directory selected when running DockerToolbox");
+                throw new Exception("Docker Toolbox only supports sharing paths under C:\\Users");
+            }
+
+            // adapt the path
+            path = path.replaceAll(":", "");
+            path = path.replaceAll("\\\\", "/");
+            path = "/" + path;
+
+            log.debug("Adapted path to " + path);
+        }
+
+        return path;
     }
 
     private static boolean isPortAvailable(int port) {
