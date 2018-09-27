@@ -5,6 +5,7 @@ public class Constants {
     public final static String FXML_DLG_LOAD_IMAGE = "fxml/dlg_load_image.fxml";
     public final static String FXML_DLG_IMAGE_SETTINGS = "fxml/dlg_image_settings.fxml";
 
+    public final static String DEFAULT_CSS = "css/style.css";
     public final static String LOW_RES_CSS = "css/low_res.css";
     public final static String HIGH_RES_CSS = "css/high_res.css";
 

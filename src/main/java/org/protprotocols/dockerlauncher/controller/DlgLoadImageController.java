@@ -12,10 +12,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import org.protprotocols.dockerlauncher.tasks.CheckNewVersionTask;
 import org.protprotocols.dockerlauncher.tasks.DockerDownloadImageTask;
 import org.protprotocols.dockerlauncher.util.Constants;
@@ -33,7 +30,7 @@ import java.util.stream.Collectors;
 public class DlgLoadImageController extends DialogController {
     private final static Logger log = LoggerFactory.getLogger(DlgLoadImageController.class);
     @FXML private ProgressIndicator progressIndicator;
-    @FXML private ComboBox imageVersionBox;
+    @FXML private ChoiceBox imageVersionBox;
     @FXML private TextArea statusTextArea;
     @FXML private Button btnLoadDockerImage;
     @FXML private Button btnNext;
@@ -225,7 +222,8 @@ public class DlgLoadImageController extends DialogController {
 
         // create the application window
         Scene scene = new Scene(root, Settings.getSceneWidth(), Settings.getSceneHeight());
-        scene.getStylesheets().addAll(Settings.getCss());
+
+        scene.getStylesheets().addAll(Constants.DEFAULT_CSS, Settings.getCss());
         primaryStage.setScene(scene);
         primaryStage.show();
     }

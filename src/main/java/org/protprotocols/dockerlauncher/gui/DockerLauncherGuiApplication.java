@@ -48,7 +48,7 @@ public class DockerLauncherGuiApplication extends Application {
 
         // create the application window
         Scene scene = new Scene(root, Settings.getSceneWidth(), Settings.getSceneHeight());
-        scene.getStylesheets().add(Settings.getCss());
+        scene.getStylesheets().addAll(Constants.DEFAULT_CSS, Settings.getCss());
         primaryStage.setTitle("ProtProtocols Protocol Launcher");
         primaryStage.setScene(scene);
         primaryStage.show();

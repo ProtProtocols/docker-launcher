@@ -7,6 +7,8 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
@@ -17,12 +19,22 @@
          <children>
             <HBox alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" VBox.vgrow="NEVER">
                <children>
-                  <Label text="Protocol Image to start:" />
+                  <ImageView fitHeight="20.0" fitWidth="27.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../icons/docker.png" />
+                     </image>
+                  </ImageView>
+                  <Label prefHeight="16.0" prefWidth="195.0" text="Protocol Image to start:" />
                   <ChoiceBox fx:id="protocolList" maxWidth="1.7976931348623157E308" prefWidth="262.0" HBox.hgrow="SOMETIMES" />
                </children>
             </HBox>
             <HBox alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308">
                <children>
+                  <ImageView fitHeight="20.0" fitWidth="27.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../icons/files.png" />
+                     </image>
+                  </ImageView>
                   <Label maxWidth="-Infinity" text="Input (Spectra) directory:" HBox.hgrow="ALWAYS" />
                   <TextField fx:id="workingDirectoryPath" editable="false" maxWidth="1.7976931348623157E308" HBox.hgrow="SOMETIMES" />
                   <Button fx:id="btnBrowseWorkdir" maxWidth="-Infinity" mnemonicParsing="false" onAction="#onBrowseWorkingDirectory" text="Browse" />
@@ -30,8 +42,13 @@
             </HBox>
             <HBox alignment="CENTER_LEFT">
                <children>
+                  <ImageView fitHeight="20.0" fitWidth="27.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../icons/directory_open.png" />
+                     </image>
+                  </ImageView>
                   <Label maxHeight="-Infinity" maxWidth="-Infinity" text="Output directory:" />
-                  <TextField fx:id="outputDirectoryPath" editable="false" maxWidth="1.7976931348623157E308" prefHeight="26.0" prefWidth="249.0" />
+                  <TextField fx:id="outputDirectoryPath" editable="false" maxWidth="1.7976931348623157E308" prefHeight="26.0" prefWidth="220.0" HBox.hgrow="ALWAYS" />
                   <Button fx:id="btnBrowseOutdir" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#onBrowseOutputDirectory" text="Browse" />
                </children>
             </HBox>
