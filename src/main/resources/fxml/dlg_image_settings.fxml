@@ -1,8 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
 <AnchorPane maxHeight="900.0" maxWidth="700.0" minHeight="287.0" minWidth="447.0" prefHeight="287.0" prefWidth="447.0" xmlns="http://javafx.com/javafx/8.0.181" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.protprotocols.dockerlauncher.controller.DlgImageSettingsController">
    <children>
       <VBox prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -15,9 +23,16 @@
             </HBox>
             <HBox alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308">
                <children>
-                  <Label maxWidth="-Infinity" text="Working Directory:" HBox.hgrow="ALWAYS" />
+                  <Label maxWidth="-Infinity" text="Input (Spectra) directory:" HBox.hgrow="ALWAYS" />
                   <TextField fx:id="workingDirectoryPath" editable="false" maxWidth="1.7976931348623157E308" HBox.hgrow="SOMETIMES" />
                   <Button fx:id="btnBrowseWorkdir" maxWidth="-Infinity" mnemonicParsing="false" onAction="#onBrowseWorkingDirectory" text="Browse" />
+               </children>
+            </HBox>
+            <HBox alignment="CENTER_LEFT">
+               <children>
+                  <Label maxHeight="-Infinity" maxWidth="-Infinity" text="Output directory:" />
+                  <TextField fx:id="outputDirectoryPath" editable="false" maxWidth="1.7976931348623157E308" prefHeight="26.0" prefWidth="249.0" />
+                  <Button fx:id="btnBrowseOutdir" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#onBrowseOutputDirectory" text="Browse" />
                </children>
             </HBox>
             <HBox alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308">

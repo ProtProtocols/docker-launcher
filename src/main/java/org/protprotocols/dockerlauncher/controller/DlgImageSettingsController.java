@@ -36,6 +36,7 @@ public class DlgImageSettingsController extends DialogController {
     @FXML public TextArea statusTextArea;
     @FXML public Button btnBrowseWorkdir;
     @FXML public Hyperlink containerURL;
+    @FXML public TextField outputDirectoryPath;
     private List<String> installedProtocols;
     private Thread containerListenerThread;
 
@@ -186,13 +187,19 @@ public class DlgImageSettingsController extends DialogController {
         portBindings.put("8888", hostPort);
         String[] exposedPorts = {"8888"};
 
-        String machinePath = getLocalWorkingDirectory(docker);
+        String machineInputPath = adaptDirectoryPath(workingDirectoryPath.getText(), docker);
+        String machineWorkingPath = adaptDirectoryPath(outputDirectoryPath.getText(), docker);
 
         final HostConfig hostConfig = HostConfig.builder()
                 .portBindings(portBindings)
                 .appendBinds(HostConfig.Bind
-                        .from(machinePath)
+                        .from(machineInputPath)
                         .to("/data")
+                        .readOnly(false)
+                        .build())
+                .appendBinds(HostConfig.Bind
+                        .from(machineWorkingPath)
+                        .to("/home/biodocker/OUT")
                         .readOnly(false)
                         .build())
                 .build();
@@ -244,14 +251,12 @@ public class DlgImageSettingsController extends DialogController {
     }
 
     /**
-     * Returns the working directory the user selected and adapts the path
-     * if needed for Docker toolbox.
+     * Adapt the path based on the running docker version and OS
+     * @param path
      * @param docker
      * @return
      */
-    private String getLocalWorkingDirectory(DockerClient docker) throws Exception {
-        String path = workingDirectoryPath.getText();
-
+    private String adaptDirectoryPath(String path, DockerClient docker) throws Exception {
         final Version dockerVersion = docker.version();
 
         if (dockerVersion.kernelVersion().contains("boot2docker")) {
@@ -282,6 +287,7 @@ public class DlgImageSettingsController extends DialogController {
         }
     }
 
+    @FXML
     public void onBrowseWorkingDirectory(ActionEvent actionEvent) {
         // create the file chooser
         DirectoryChooser directoryChooser = new DirectoryChooser();
@@ -292,10 +298,38 @@ public class DlgImageSettingsController extends DialogController {
 
         if (directory != null) {
             workingDirectoryPath.setText(directory.getAbsolutePath());
-            btnNext.setDisable(false);
-        } else {
-            btnNext.setDisable(true);
         }
+
+        testNextPossible();
+    }
+
+    @FXML
+    public void onBrowseOutputDirectory(ActionEvent actionEvent) {
+        // create the file chooser
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setTitle("Select output directory");
+        directoryChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+
+        File directory = directoryChooser.showDialog(primaryStage);
+
+        if (directory != null) {
+            outputDirectoryPath.setText(directory.getAbsolutePath());
+        }
+
+        testNextPossible();
+    }
+
+    private void testNextPossible() {
+        boolean nextImpossible = false;
+
+        if (workingDirectoryPath.getText().length() == 0) {
+            nextImpossible = true;
+        }
+        if (outputDirectoryPath.getText().length() == 0) {
+            nextImpossible = true;
+        }
+
+        btnNext.setDisable(nextImpossible);
     }
 
     public void onHyperlinkedClicked(ActionEvent actionEvent) {
