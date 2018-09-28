@@ -1,5 +1,9 @@
 # docker-launcher
+
 A lightweight Java GUI to launch ProtProtocol images
+
+![docker-launcher Logo](./icon.svg)
+<img src="./icon.svg">
 
 ## Introduction
 

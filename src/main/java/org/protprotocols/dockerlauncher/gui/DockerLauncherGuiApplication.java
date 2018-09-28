@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -26,15 +27,12 @@ public class DockerLauncherGuiApplication extends Application {
         // TODO: add function to gracefully stop everything
         primaryStage.setOnHiding(W -> System.exit(1));
 
-        // TODO: Add icons
-        /**
-        String[] resolutions = {"32", "64", "128"};
+        String[] resolutions = {"32", "64", "128", "256"};
         for (String resolution : resolutions) {
             primaryStage.getIcons().add(new Image(
                     DockerLauncherGuiApplication.class.getClassLoader().getResourceAsStream(
-                            "images/application-icon_" + resolution + ".png")));
+                            "icons/icon_" + resolution + ".png")));
         }
-         */
 
         showLoadImage(primaryStage);
     }
@@ -49,7 +47,7 @@ public class DockerLauncherGuiApplication extends Application {
         // create the application window
         Scene scene = new Scene(root, Settings.getSceneWidth(), Settings.getSceneHeight());
         scene.getStylesheets().addAll(Constants.DEFAULT_CSS, Settings.getCss());
-        primaryStage.setTitle("ProtProtocols Protocol Launcher");
+        primaryStage.setTitle("ProtProtocols docker-launcher");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
