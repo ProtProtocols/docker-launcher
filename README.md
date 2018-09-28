@@ -9,12 +9,26 @@ A lightweight Java GUI to launch ProtProtocol images
 This Java tool provides a simple graphical user interface to install and launch
 ProtProtocol images.
 
+ProtProtocol images are shipped as [Docker](https://www.docker.com) containers
+that contain a complete analysis environment for common proteomics bioinformatics
+workflows. Since [Docker](https://www.docker.com) containers are light-weight virtual
+machines, all required software tools are installed by simply downloading the image.
+
+We currently provide the following ProtProtocol images:
+
+  * [IsoLabeledProtocol](https://github.com/ProtProtocols/IsoLabeledProtocol): This
+    protocol supports the analysis of isobarically-labelled (TMT/iTRAQ) datasets starting
+    from the identification of the spectra to the final statistical and differential
+    expression analysis.
+
 ## Usage
 
 ### Installation
 
   * docker-launcher requires Java to be installed. You can download Java from http://www.java.com
-  * Download the current version from the [releases](https://github.com/ProtProtocols/docker-launcher/releases). 
+  * You also need to have [Docker](https://www.docker.com) installed on your system. For
+  * Download the current version from the [releases](https://github.com/ProtProtocols/docker-launcher/releases).
+    For help with this step see our [docker installation manual](./docs/installing_docker.md)
   * Unpack the zip file to any directory
   * Simply launch the docker-launcher-[VERSION].jar file (double click or use `java -jar /path/to/docker-launcher-[VERSION].jar)
 
