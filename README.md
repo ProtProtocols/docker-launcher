@@ -26,9 +26,9 @@ We currently provide the following ProtProtocol images:
 ### Installation
 
   * docker-launcher requires Java to be installed. You can download Java from http://www.java.com
-  * You also need to have [Docker](https://www.docker.com) installed on your system. For
-  * Download the current version from the [releases](https://github.com/ProtProtocols/docker-launcher/releases).
+  * You also need to have [Docker](https://www.docker.com) installed on your system.
     For help with this step see our [docker installation manual](./docs/installing_docker.md)
+  * Download the current version from the [releases](https://github.com/ProtProtocols/docker-launcher/releases).
   * Unpack the zip file to any directory
   * Simply launch the docker-launcher-[VERSION].jar file (double click or use `java -jar /path/to/docker-launcher-[VERSION].jar)
 
