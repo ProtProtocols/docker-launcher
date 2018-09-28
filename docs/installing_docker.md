@@ -28,7 +28,7 @@ in the [Docker store](https://store.docker.com/search?type=edition&offering=comm
 Once you installed Docker using the setup file, you can find the Docker
 icon in your taskbar.
 
-<img src=https://docs.docker.com/docker-for-windows/images/whale-icon-systray-hidden.png" width="250" />
+<img src="https://docs.docker.com/docker-for-windows/images/whale-icon-systray-hidden.png" width="250" />
 
 You can **access the settings** by right-clicking
 this icon and clicking on "Settings".
