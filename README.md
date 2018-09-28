@@ -2,7 +2,7 @@
 
 A lightweight Java GUI to launch ProtProtocol images
 
-<img src="./icon.png", width="250" />
+<img src="./icon.svg" width="250">
 
 ## Introduction
 
