@@ -28,22 +28,22 @@ in the [Docker store](https://store.docker.com/search?type=edition&offering=comm
 Once you installed Docker using the setup file, you can find the Docker
 icon in your taskbar.
 
-![Docker in taskbar](https://docs.docker.com/docker-for-windows/images/whale-icon-systray-hidden.png)
+<img src=https://docs.docker.com/docker-for-windows/images/whale-icon-systray-hidden.png" width="250" />
 
 You can **access the settings** by right-clicking
 this icon and clicking on "Settings".
 
-![Docker settings option](https://docs.docker.com/docker-for-windows/images/docker-menu-settings.png)
+<img src="https://docs.docker.com/docker-for-windows/images/docker-menu-settings.png" width="300" />
 
 In order for **docker-launcher** to connect to
 your docker instance, you need to `Expose daemon on tcp://localhost:2375 without TLS`.
 
-![Docker general settings](https://docs.docker.com/docker-for-windows/images/settings-general.png)
+<img src="https://docs.docker.com/docker-for-windows/images/settings-general.png" width="450" />
 
 Finally, in order to be able to directly access your folders from the docker image (ie.
 the ProtProtocols protocol) you need to share the respective drive with docker:
 
-![Docker drive sharing](https://docs.docker.com/docker-for-windows/images/settings-shared-drives.png)
+<img src="https://docs.docker.com/docker-for-windows/images/settings-shared-drives.png" width="450" />
 
 You can find more information on the Docker settings on the [Docker homepage](https://docs.docker.com/docker-for-windows/#general).
 
