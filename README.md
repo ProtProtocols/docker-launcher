@@ -34,6 +34,13 @@ We currently provide the following ProtProtocol images:
 
 ## Changes
 
+### Version 0.4
+
+  * Available protocol image versions are automatically detected based on the GitHub tag versions.
+  * Added controls to set input and output directory separately
+  * Re-styled application
+  * Added icon
+
 ### Version 0.3
 
   * Added support to launch image when Windows drive sharing fails
