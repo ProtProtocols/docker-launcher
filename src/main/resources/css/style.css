@@ -1,0 +1,23 @@
+.root {
+    -fx-background-color: #FFFFFF;
+}
+
+.button {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #000000;
+}
+
+.button:hover {
+   -fx-border-color: #00bfff;
+   -fx-cursor: hand;
+}
+
+ChoiceBox {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #000000;
+}
+
+ChoiceBox:hover {
+    -fx-border-color: #00bfff;
+    -fx-cursor: hand;
+}

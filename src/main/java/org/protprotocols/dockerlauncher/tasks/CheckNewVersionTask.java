@@ -1,18 +1,11 @@
 package org.protprotocols.dockerlauncher.tasks;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import javafx.concurrent.Task;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.protprotocols.dockerlauncher.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
@@ -34,25 +27,14 @@ public class CheckNewVersionTask extends Task<String> {
         String currentVersion = properties.getProperty("version");
         log.debug("Running version " + currentVersion);
 
-        // get the latest release
-        URL url = new URL(properties.getProperty("release_url"));
-        URLConnection request = url.openConnection();
-        request.connect();
-
-        // Convert to a JSON object to print data
-        JsonParser jp = new JsonParser(); //from gson
-        JsonElement root = jp.parse(new InputStreamReader((InputStream) request.getContent())); //Convert the input stream to a json element
-        JsonArray releases = root.getAsJsonArray();
-
-        List<String> availableReleases = new ArrayList<>(releases.size());
-
-        for (JsonElement release : releases) {
-            log.debug("Found release " + release.getAsJsonObject().get("tag_name"));
-            availableReleases.add(release.getAsJsonObject().get("tag_name").getAsString());
-        }
+        List<String> availableReleases = GithubReleaseFetcher.fetchReleases(
+                properties.getProperty(Constants.PROPERTY_APPLICATION_RELEASE_URL));
 
         DefaultArtifactVersion runningVersion = new DefaultArtifactVersion(currentVersion);
-        List<DefaultArtifactVersion> availableVersions = availableReleases.stream().map(DefaultArtifactVersion::new).sorted().collect(Collectors.toList());
+        List<DefaultArtifactVersion> availableVersions = availableReleases.stream()
+                .map(DefaultArtifactVersion::new)
+                .sorted()
+                .collect(Collectors.toList());
 
         if (availableVersions.get(availableVersions.size() - 1).compareTo(runningVersion) > 0) {
             return availableVersions.get(availableVersions.size() - 1).toString();

@@ -5,6 +5,7 @@ public class Constants {
     public final static String FXML_DLG_LOAD_IMAGE = "fxml/dlg_load_image.fxml";
     public final static String FXML_DLG_IMAGE_SETTINGS = "fxml/dlg_image_settings.fxml";
 
+    public final static String DEFAULT_CSS = "css/style.css";
     public final static String LOW_RES_CSS = "css/low_res.css";
     public final static String HIGH_RES_CSS = "css/high_res.css";
 
@@ -16,8 +17,10 @@ public class Constants {
 
     public final static double HIGH_DPI = 150;
 
+    public final static String PROPERTY_APPLICATION_RELEASE_URL = "release_url";
     public final static String PROPERTY_IMAGE_NAME = "docker_image";
     public final static String PROPERTY_IMAGE_VERSIONS = "docker_image_releases";
+    public final static String PORPERTY_IMAGE_RELEASE_URL = "docker_image_release_url";
 
     private Constants() {
         // this class should not be created
