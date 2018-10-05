@@ -26,8 +26,8 @@
                      </image>
                   </ImageView>
                   <Label text="Image version:" />
-                  <ChoiceBox fx:id="imageVersionBox" prefWidth="150.0" />
-                  <Button id="btn_load_docker_image" fx:id="btnLoadDockerImage" mnemonicParsing="false" onAction="#onLoadDockerImageClicked" text="Download" />
+                  <ChoiceBox fx:id="imageVersionBox" disable="true" prefWidth="150.0" />
+                  <Button id="btn_load_docker_image" fx:id="btnLoadDockerImage" disable="true" mnemonicParsing="false" onAction="#onLoadDockerImageClicked" text="Download" />
                   <ProgressIndicator fx:id="progressIndicator" prefHeight="16.0" prefWidth="31.0" visible="false" />
                </children>
             </HBox>

@@ -17,8 +17,10 @@ public class Constants {
 
     public final static double HIGH_DPI = 150;
 
+    public final static String PROPERTY_APPLICATION_RELEASE_URL = "release_url";
     public final static String PROPERTY_IMAGE_NAME = "docker_image";
     public final static String PROPERTY_IMAGE_VERSIONS = "docker_image_releases";
+    public final static String PORPERTY_IMAGE_RELEASE_URL = "docker_image_release_url";
 
     private Constants() {
         // this class should not be created
