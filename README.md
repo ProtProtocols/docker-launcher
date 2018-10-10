@@ -55,3 +55,9 @@ We currently provide the following ProtProtocol images:
 ### Version 0.2
 
   * Added functionality to select which image version to download and / or update
+
+## Acknowledgements
+
+<img src="flag_yellow_low.png" height="200" /><img src="LOGO-ERC.jpg" height="200" />
+
+This project has received funding from the European Research Council (ERC) under the European Union's Horizon 2020 research and innovation programme under grant agreement No 788042.
