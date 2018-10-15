@@ -16,7 +16,7 @@ machines, all required software tools are installed by simply downloading the im
 
 We currently provide the following ProtProtocol images:
 
-  * [IsoLabeledProtocol](https://github.com/ProtProtocols/IsoLabeledProtocol): This
+  * [IsoProt](https://github.com/ProtProtocols/IsoProt): This
     protocol supports the analysis of isobarically-labelled (TMT/iTRAQ) datasets starting
     from the identification of the spectra to the final statistical and differential
     expression analysis.
