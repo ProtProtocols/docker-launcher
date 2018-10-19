@@ -136,11 +136,22 @@ public class DlgImageSettingsController extends DialogController {
                 statusTextArea.appendText("  Docker failed to forward port.\n" +
                         "Please restart the Docker service to solve this issue.\n" +
                         "If this does not help, restart your computer as well.\n");
+
+                Alert errorMsg = new Alert(Alert.AlertType.ERROR, "Docker failed to forward port. " +
+                        "Please restart the Docker service.");
+                errorMsg.setGraphic(null);
+                errorMsg.setHeaderText("");
+                errorMsg.showAndWait();
             }
             else {
                 statusTextArea.appendText("  " + e.getMessage() + "\n");
                 // only save the stack trace if we don't know what's going on
                 LoggerHelperFunctions.logStackTrace(log, e);
+                Alert errorMsg = new Alert(Alert.AlertType.ERROR, "Failed to launch docker image " +
+                        e.getMessage());
+                errorMsg.setGraphic(null);
+                errorMsg.setHeaderText("");
+                errorMsg.showAndWait();
             }
 
         } finally {
@@ -223,6 +234,12 @@ public class DlgImageSettingsController extends DialogController {
             if (e.getMessage().toLowerCase().contains("firewall") || e.getMessage().toLowerCase().contains("drive")) {
                 log.info("Drive sharing is blocked by a firewall or has not been enabled, launching image without shared drives");
                 statusTextArea.appendText("  Drive sharing is blocked by a firewall or has not been enabled.\nLaunching image without shared drives...\n");
+
+                Alert infoMsg = new Alert(Alert.AlertType.INFORMATION, "Drive sharing is blocked by a firewall. Starting image without drive sharing...");
+                infoMsg.setHeaderText("");
+                infoMsg.setGraphic(null);
+                infoMsg.showAndWait();
+
                 workingDirectoryPath.setText("-- DISABLED --");
                 // TODO: add more verbose information about what it means to work without shared drives
 

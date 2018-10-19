@@ -16,7 +16,7 @@ machines, all required software tools are installed by simply downloading the im
 
 We currently provide the following ProtProtocol images:
 
-  * [IsoLabeledProtocol](https://github.com/ProtProtocols/IsoLabeledProtocol): This
+  * [IsoProt](https://github.com/ProtProtocols/IsoProt): This
     protocol supports the analysis of isobarically-labelled (TMT/iTRAQ) datasets starting
     from the identification of the spectra to the final statistical and differential
     expression analysis.
@@ -33,6 +33,12 @@ We currently provide the following ProtProtocol images:
   * Simply launch the docker-launcher-[VERSION].jar file (double click or use `java -jar /path/to/docker-launcher-[VERSION].jar)
 
 ## Changes
+
+### Version 0.5
+
+  * Updated to new ProtProtocols docker hub name
+  * Added alerts for all critical errors
+  *
 
 ### Version 0.4
 

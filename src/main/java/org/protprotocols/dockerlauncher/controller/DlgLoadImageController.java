@@ -4,7 +4,6 @@ import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.exceptions.DockerException;
 import com.spotify.docker.client.messages.Image;
-import com.spotify.docker.client.messages.Version;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -75,6 +74,10 @@ public class DlgLoadImageController extends DialogController {
             final List<String> foundProtocols = (List<String>) event.getSource().getValue();
             Platform.runLater(() -> {
                 if (foundProtocols == null) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR, "Failed to connect do docker daemon.");
+                    alert.setHeaderText("");
+                    alert.setGraphic(null);
+                    alert.showAndWait();
                     return;
                 }
 
@@ -114,15 +117,9 @@ public class DlgLoadImageController extends DialogController {
         // always add latest
         availableVersions.add("latest");
 
-        // select the latest stable release
-        int selectIndex = 0;
-
-        if (availableVersions.size() > 1) {
-            selectIndex = availableVersions.size() - 2;
-        }
-
         imageVersionBox.setItems(FXCollections.observableArrayList(availableVersions));
-        imageVersionBox.setValue(availableVersions.get(selectIndex));
+        log.debug("Selecting version " + availableVersions.get(0));
+        imageVersionBox.setValue(availableVersions.get(0));
     }
 
     public static List<String> getInstalledProtocols(DockerClient docker, String imageName) throws DockerException, InterruptedException {
@@ -191,6 +188,11 @@ public class DlgLoadImageController extends DialogController {
         statusTextArea.appendText("  " + e.getMessage() + "\n");
         log.error("Failed to download image.\n" + e.getMessage());
         LoggerHelperFunctions.logStackTrace(log, e);
+
+        Alert alert = new Alert(Alert.AlertType.ERROR, "Failed to download image: " + e.getMessage());
+        alert.setGraphic(null);
+        alert.setHeaderText("");
+        alert.showAndWait();
     }
 
     @FXML
