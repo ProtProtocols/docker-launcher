@@ -4,7 +4,7 @@
 
     <groupId>org.protprotocols</groupId>
     <artifactId>docker-launcher</artifactId>
-    <version>0.5</version>
+    <version>0.6-SNAPSHOT</version>
 
     <licenses>
         <license>
