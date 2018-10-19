@@ -38,7 +38,6 @@ We currently provide the following ProtProtocol images:
 
   * Updated to new ProtProtocols docker hub name
   * Added alerts for all critical errors
-  *
 
 ### Version 0.4
 
