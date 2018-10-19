@@ -114,15 +114,9 @@ public class DlgLoadImageController extends DialogController {
         // always add latest
         availableVersions.add("latest");
 
-        // select the latest stable release
-        int selectIndex = 0;
-
-        if (availableVersions.size() > 1) {
-            selectIndex = availableVersions.size() - 2;
-        }
-
         imageVersionBox.setItems(FXCollections.observableArrayList(availableVersions));
-        imageVersionBox.setValue(availableVersions.get(selectIndex));
+        log.debug("Selecting version " + availableVersions.get(0));
+        imageVersionBox.setValue(availableVersions.get(0));
     }
 
     public static List<String> getInstalledProtocols(DockerClient docker, String imageName) throws DockerException, InterruptedException {
