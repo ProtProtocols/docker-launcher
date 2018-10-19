@@ -34,6 +34,12 @@ We currently provide the following ProtProtocol images:
 
 ## Changes
 
+### Version 0.5
+
+  * Updated to new ProtProtocols docker hub name
+  * Added alerts for all critical errors
+  *
+
 ### Version 0.4
 
   * Available protocol image versions are automatically detected based on the GitHub tag versions.
